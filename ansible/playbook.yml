@@ -3,7 +3,7 @@
   become: yes
 
   vars:
-    image_name: "{{ lookup('env', 'IMAGE_NAME') }}"
+    image_name: "{{ lookup('env','IMAGE_NAME') }}"
     container_name: devops-app
 
   tasks:
@@ -19,7 +19,13 @@
         name: docker-compose
         state: present
 
-    - name: Pull latest image
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Run or update container
       docker_container:
         name: "{{ container_name }}"
         image: "{{ image_name }}"
@@ -27,3 +33,4 @@
         restart_policy: always
         ports:
           - "5000:5000"
+        recreate: true
